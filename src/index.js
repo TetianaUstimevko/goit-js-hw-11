@@ -62,7 +62,7 @@ async function fetchGallery() {
   isShown += hits.length;
 
   if (isShown < total) {
-    Notify.success(`Hooray! We found ${total} images !!!`);
+    Notify.success(`Hooray! We found ${total} images.`);
     refs.loadMoreBtn.classList.remove('is-hidden');
   }
 
