@@ -1,79 +1,80 @@
 import './sass/index.scss';
-import NewApiService from './js/api-service';
+import newsApiService from './js/api-service';
 import { lightbox } from './js/lightbox';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const refs = {
-    searchForm: document.querySelector('.search-form'),
-    galleryContainer: document.querySelector('.gallery'),
-    loadMoreBtn: document.querySelector('.load-more'),
+  searchForm: document.querySelector('.search-form'),
+  galleryContainer: document.querySelector('.gallery'),
+  loadMoreBtn: document.querySelector('.load-more'),
 };
-
 let isShown = 0;
-const NewApiService = new NewApiService();
+const newsApiService = new NewsApiService();
 
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
 const options = {
-    rootMargin: '50px',
-    root: null,
-    threshold: 0.3,
+  rootMargin: '50px',
+  root: null,
+  threshold: 0.3,
 };
-
 const observer = new IntersectionObserver(onLoadMore, options);
 
 function onSearch(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    refs.galleryContainer.innerHTML = '';
-    NewApiService.guery = e.currentTarget.elements.searchQuery.value.trim();
-    NewApiService.resetPage(); 
+  refs.galleryContainer.innerHTML = '';
+  newsApiService.query = e.currentTarget.elements.searchQuery.value.trim();
+  newsApiService.resetPage();
 
-    if (NewApiService.guery === '') {
-        Notify.warning('Please, fill the main field');
-        return;
-    }
-    isShown = 0;
-    fetchGallery();
-    onReadGallery(hits);
+  if (newsApiService.query === '') {
+    Notify.warning('Please, fill the main field');
+    return;
+  }
+
+  isShown = 0;
+  fetchGallery();
+  onRenderGallery(hits);
 }
-    
+
 function onLoadMore() {
-    NewApiService.incrementPage();
-    fetchGallery();
+  newsApiService.incrementPage();
+  fetchGallery();
 }
-    
+
 async function fetchGallery() {
+  refs.loadMoreBtn.classList.add('is-hidden');
+
+  const r = await newsApiService.fetchGallery();
+  const { hits, total } = r;
+  isShown += hits.length;
+
+  if (!hits.length) {
+    Notify.failure(
+      `Sorry, there are no images matching your search query. Please try again.`
+    );
     refs.loadMoreBtn.classList.add('is-hidden');
+    return;
+  }
 
-    const r = await NewApiService.fetchGallery();
-    const { hits, total } = r;
-    isShown += hits.length;
+  onRenderGallery(hits);
+  isShown += hits.length;
 
-    if (!hits.length) {
-        Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
+  if (isShown < total) {
+    Notify.success(`Hooray! We found ${total} images !!!`);
+    refs.loadMoreBtn.classList.remove('is-hidden');
+  }
 
-        refs.loadMoreBtn.classList.add('is-hidden');
-        return;
-    }
-
-    onReadGallery(hits);
-    isShown += hits.length;
-
-    if (isShown < total) {
-        Notify.success(`Hooray! We found ${total} images.`);
-        refs.loadMoreBtn.classList.remove('is-hidden');
-    }
-
-    if (isShown >= total) {
-        Notify.info("We're sorry, but you've reached the end of search results.");
+  if (isShown >= total) {
+    Notify.info("We're sorry, but you've reached the end of search results.");
+  }
 }
 
-}
-
-function onReadGallery(elements) {
-    const markup = elements.map(({
+function onRenderGallery(elements) {
+  const markup = elements
+    .map(
+      ({
         webformatURL,
         largeImageURL,
         tags,
@@ -81,7 +82,7 @@ function onReadGallery(elements) {
         views,
         comments,
         downloads,
-    }) => {
+      }) => {
         return `<div class="photo-card">
     <a href="${largeImageURL}">
       <img class="photo-img" src="${webformatURL}" alt="${tags}" loading="lazy" />
@@ -105,8 +106,9 @@ function onReadGallery(elements) {
       </p>
     </div>
     </div>`;
-    }).join('');
-
-    refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
-    lightbox.refresh();
+      }
+    )
+    .join('');
+  refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
+  lightbox.refresh();
 }

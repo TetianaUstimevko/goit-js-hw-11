@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export default class NewApiService {
+export default class NewsApiService {
     constructor() {
         this.searchQuery = '';
         this.page = 1;
