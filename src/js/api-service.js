@@ -7,7 +7,7 @@ export default class NewsApiService {
     this.PER_PAGE = 40;
   }
 
-     async fetchGallery() {
+  async fetchGallery() {
     const axiosOptions = {
       method: 'get',
       url: 'https://pixabay.com/api/',
@@ -21,7 +21,7 @@ export default class NewsApiService {
         per_page: `${this.PER_PAGE}`,
       },
     };
-        try {
+    try {
       const response = await axios(axiosOptions);
 
       const data = response.data;
@@ -33,17 +33,21 @@ export default class NewsApiService {
     }
   }
 
-    incrementPage() {
-    this.page += 1;
+  incrementPage() {
+    return (this.page += 1);
   }
+
+  //   incrementPage() {
+  //   this.page += 1;
+  // }
 
   resetPage() {
     this.page = 1;
   }
 
-  resetEndOfHits() {
-    this.endOfHits = false;
-  }
+  // resetEndOfHits() {
+  //   this.endOfHits = false;
+  // }
 
   get query() {
     return this.searchQuery;

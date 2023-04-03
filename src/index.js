@@ -3,16 +3,34 @@ import NewsApiService from './js/api-service';
 import { lightbox } from './js/lightbox';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
+
+
+// function scrolPlay() {
+//   refs.body.classList.add('loading');
+// }
+
+// function scrolStop() {
+//   window.setTimeout(function () {
+//     refs.body.classList.remove('loading');
+//     refs.body.classList.add('loaded');
+//   }, 1500);
+// }
+
+
 const refs = {
   searchForm: document.querySelector('.search-form'),
   galleryContainer: document.querySelector('.gallery'),
   loadMoreBtn: document.querySelector('.load-more'),
+  // scrol: document.querySelector('.js-scrol'),
+
 };
+
 let isShown = 0;
 const newsApiService = new NewsApiService();
 
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
+// scrolPlay();
 
 const options = {
   rootMargin: '50px',
@@ -41,29 +59,45 @@ function onSearch(e) {
 function onLoadMore() {
   newsApiService.incrementPage();
   fetchGallery();
+  // scrolPlay();
 }
+
+// scrolPlay();
+
+// window.addEventListener('load', () => {
+//   console.log('All resources finished loading!');
+
+//   scrolStop();
+// });
 
 async function fetchGallery() {
   refs.loadMoreBtn.classList.add('is-hidden');
+ 
+  // scrolPlay();
 
   const r = await newsApiService.fetchGallery();
+  
   const { hits, total } = r;
   isShown += hits.length;
 
+   
   if (!hits.length) {
     Notify.failure(
       `Sorry, there are no images matching your search query. Please try again.`
     );
     refs.loadMoreBtn.classList.add('is-hidden');
+       
     return;
   }
 
+  
   onRenderGallery(hits);
   isShown += hits.length;
 
   if (isShown < total) {
     Notify.success(`Hooray! We found ${total} images.`);
     refs.loadMoreBtn.classList.remove('is-hidden');
+    // scrolPlay();
   }
 
   if (isShown >= total) {
@@ -112,3 +146,4 @@ function onRenderGallery(elements) {
   refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
 }
+
