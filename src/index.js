@@ -16,6 +16,7 @@ const newsApiService = new NewsApiService();
 
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
+
 // scrolPlay();
 
 const options = {
@@ -75,7 +76,6 @@ async function fetchGallery() {
   }
 
 
-
   if (isShown >= total) {
     Notify.info("We're sorry, but you've reached the end of search results.");
   }
@@ -122,3 +122,28 @@ function onRenderGallery(elements) {
   refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
 }
+
+// Нескінченний скрол
+
+// window.addEventListener('scroll', () => {
+  
+//   if (window.scrollY > document.documentElement.scrollHeight - window.innerHeight * 0.8) {
+//     loadMore();
+//   }
+// });
+
+// function loadMore() {
+//   const xhr = new XMLHttpRequest();
+//   xhr.open('GET', `https://pixabay.com/data?page=${page}&PER_PAGE=${PER_PAGE}`);
+//   xhr.onload = () => {
+//     const data = JSON.parse(xhr.responseText);
+//     data.forEach(item => {
+//       const element = document.createElement('div');
+//       element.textContent = item.text;
+//       document.querySelector('.gallery').appendChild(element);
+//     });
+//     page++;
+//   };
+//   xhr.send();
+// }
+
